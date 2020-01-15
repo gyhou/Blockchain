@@ -5,6 +5,7 @@ import sys
 import json
 import time
 
+
 def proof_of_work(block):
     """
     Simple Proof of Work Algorithm
@@ -52,10 +53,10 @@ if __name__ == '__main__':
     print("ID is", id)
     f.close()
 
-    start_time = time.time()
     coins = 0
     # Run forever until interrupted
     while True:
+        start_time = time.time()
         r = requests.get(url=node + "/last_block")
         # Handle non-json response
         try:
@@ -65,12 +66,14 @@ if __name__ == '__main__':
             print("Response returned:")
             print(r)
             break
-        
+
         # TODO: Get the block from `data` and use it to look for a new proof
         new_proof = proof_of_work(data['last_block'])
+        # new_proof = proof_of_work(data.get('last_block'))
 
         # When found, POST it to the server {"proof": new_proof, "id": id}
-        post_data = {"proof": new_proof, "id": id}
+        post_data = {"proof": new_proof,
+                     "id": id}
 
         r = requests.post(url=node + "/mine", json=post_data)
         data = r.json()
@@ -78,11 +81,11 @@ if __name__ == '__main__':
         # TODO: If the server responds with a 'message' 'New Block Forged'
         # add 1 to the number of coins mined and print it.
         # Otherwise, print the message from the server.
-        
+
         if data['message'] == 'New Block Forged':
             coins += 1
-            print(f'Coins: {coins}')
+            print(f'Total coins mined: {coins}')
         else:
             print(data['message'])
 
-        print("--- %s seconds ---" % (time.time() - start_time))
+        print(f'Timer: {time.time() - start_time:.2f} seconds')
