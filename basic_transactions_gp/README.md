@@ -3,9 +3,9 @@
 Create a method in the `Blockchain` class called `new_transaction` 
 that adds a new transaction to the list of transactions:
 
-    :param sender: <str> Address of the Recipient
-    :param recipient: <str> Address of the Recipient
-    :param amount: <int> Amount
+    :param sender: <str> Name of the Sender
+    :param recipient: <str> Name of the Recipient
+    :param amount: <float> Amount
     :return: <int> The index of the `block` that will hold this transaction
 
 Modify the `mine` endpoint to create a reward via a `new_transaction`
