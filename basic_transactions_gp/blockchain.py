@@ -136,7 +136,7 @@ def last_block():
     return jsonify(response), 200
 
 
-@app.route('/transaction/new', methods=['POST'])
+@app.route('/transactions/new', methods=['POST'])
 def new_transaction():
     data = request.get_json()
     required = ['sender', 'recipient', 'amount']
