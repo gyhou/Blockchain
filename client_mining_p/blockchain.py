@@ -38,7 +38,7 @@ class Blockchain(object):
             'timestamp': time(),
             'transactions': self.current_transactions,
             'proof': proof,
-            'previous_hash': previous_hash
+            'previous_hash': previous_hash or self.hash(self.last_block)
         }
 
         # Reset the current list of transactions
@@ -97,7 +97,7 @@ class Blockchain(object):
         guess = f"{block_string}{proof}".encode()
         guess_hash = hashlib.sha256(guess).hexdigest()
 
-        return guess_hash[:6] == '000000'
+        return guess_hash[:4] == '0000'
 
 
 # Instantiate our Node
@@ -128,17 +128,28 @@ def mine():
             'message': 'Proof or ID not present'
         }
         return jsonify(response), 400
-    # Forge the new Block by adding it to the chain with the proof
-    previous_hash = blockchain.hash(blockchain.last_block)
-    block = blockchain.new_block(data['proof'], previous_hash)
 
-    response = {
-        # TODO: Send a JSON response with the new block
-        'new_block': block,
-        'message': 'New Block Forged'
-    }
-
-    return jsonify(response), 200
+    last_block_str = json.dumps(blockchain.last_block, sort_keys=True)
+    # Determine if proof is valid
+    if blockchain.valid_proof(last_block_str, data['proof']):
+        # Forge the new Block by adding it to the chain with the proof
+        previous_hash = blockchain.hash(blockchain.last_block)
+        block = blockchain.new_block(data['proof'], previous_hash)
+        response = {
+            # TODO: Send a JSON response with the new block
+            'new_block': block,
+            'message': 'New Block Forged',
+            'index': block['index'],
+            'transactions': block['transactions'],
+            'proof': block['proof'],
+            'previous_hash': block['previous_hash']
+        }
+        return jsonify(response), 200
+    else:
+        response = {
+            'message': "Proof was invalid or already submitted."
+        }
+        return jsonify(response), 200
 
 
 @app.route('/chain', methods=['GET'])
